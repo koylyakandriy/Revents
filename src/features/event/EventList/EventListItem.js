@@ -8,6 +8,7 @@ class EventListItem extends Component {
 	render() {
 		const {
 			event: {
+				id,
 				title,
 				date,
 				venue,
@@ -15,7 +16,10 @@ class EventListItem extends Component {
 				hostPhotoURL,
 				hostedBy,
 				attendees
-			}
+			},
+			selectEvent,
+			event,
+			deleteEvent
 		} = this.props;
 		return (
 			<Segment.Group>
@@ -48,7 +52,20 @@ class EventListItem extends Component {
 				</Segment>
 				<Segment clearing>
 					<span>{description}</span>
-					<Button as='a' color='teal' floated='right' content='View' />
+					<Button
+						onClick={() => deleteEvent(id)}
+						as='a'
+						color='red'
+						floated='right'
+						content='Delete'
+					/>
+					<Button
+						onClick={() => selectEvent(event)}
+						as='a'
+						color='teal'
+						floated='right'
+						content='View'
+					/>
 				</Segment>
 			</Segment.Group>
 		);
