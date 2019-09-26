@@ -1,15 +1,12 @@
 import React, { Component } from "react";
 import { Button, Segment, Form } from "semantic-ui-react";
-import {} from "redux-form";
+import { connect } from "react-redux";
+import cuid from "cuid";
+
+import { createEventAction, updateEventAction } from "../eventActions";
 
 class EventForm extends Component {
-	state = {
-		title: "",
-		date: "",
-		city: "",
-		venue: "",
-		hostedBy: ""
-	};
+	state = { ...this.props.event };
 
 	componentDidMount() {
 		const { selectedEvent } = this.props;
@@ -21,22 +18,33 @@ class EventForm extends Component {
 	}
 
 	handleFormSubmit = e => {
-		const { updateEvent, createEvent } = this.props;
+		const { createEventAction, updateEventAction, history } = this.props;
 		e.preventDefault();
 
-		if (this.state.id) updateEvent(this.state);
-		else createEvent(this.state);
+		if (this.state.id) {
+			updateEventAction(this.state);
+			history.push(`/events/${this.state.id}`);
+		} else {
+			const newEvent = {
+				...this.state,
+				id: cuid(),
+				hostPhotoURL: "/assets/user.png"
+			};
+			createEventAction(newEvent);
+
+			history.push("/events");
+		}
 	};
 
-	handleChange = ({ target: { name, value } }) => {
+	handleInputChange = ({ target: { name, value } }) => {
 		this.setState({
 			[name]: value
 		});
 	};
 
 	render() {
-		const { cancelFormOpen } = this.props;
 		const { title, date, city, venue, hostedBy } = this.state;
+		const { history } = this.props;
 		return (
 			<Segment>
 				<Form onSubmit={this.handleFormSubmit} autoComplete='off'>
@@ -45,7 +53,7 @@ class EventForm extends Component {
 						<input
 							name='title'
 							value={title}
-							onChange={this.handleChange}
+							onChange={this.handleInputChange}
 							placeholder='Event Title'
 						/>
 					</Form.Field>
@@ -54,7 +62,7 @@ class EventForm extends Component {
 						<input
 							name='date'
 							value={date}
-							onChange={this.handleChange}
+							onChange={this.handleInputChange}
 							type='date'
 							placeholder='Event Date'
 						/>
@@ -64,7 +72,7 @@ class EventForm extends Component {
 						<input
 							name='city'
 							value={city}
-							onChange={this.handleChange}
+							onChange={this.handleInputChange}
 							placeholder='City event is taking place'
 						/>
 					</Form.Field>
@@ -73,7 +81,7 @@ class EventForm extends Component {
 						<input
 							name='venue'
 							value={venue}
-							onChange={this.handleChange}
+							onChange={this.handleInputChange}
 							placeholder='Enter the Venue of the event'
 						/>
 					</Form.Field>
@@ -82,14 +90,14 @@ class EventForm extends Component {
 						<input
 							name='hostedBy'
 							value={hostedBy}
-							onChange={this.handleChange}
+							onChange={this.handleInputChange}
 							placeholder='Enter the name of person hosting'
 						/>
 					</Form.Field>
 					<Button positive type='submit'>
 						Submit
 					</Button>
-					<Button type='button' onClick={cancelFormOpen}>
+					<Button type='button' onClick={history.goBack}>
 						Cancel
 					</Button>
 				</Form>
@@ -98,4 +106,32 @@ class EventForm extends Component {
 	}
 }
 
-export default EventForm;
+const mapStateToProps = (state, ownProps) => {
+	const eventId = ownProps.match.params.id;
+
+	let event = {
+		title: "",
+		date: "",
+		city: "",
+		venue: "",
+		hostedBy: ""
+	};
+
+	if (eventId && state.events.length > 0) {
+		event = state.events.filter(event => event.id === eventId)[0];
+	}
+
+	return {
+		event
+	};
+};
+
+const mapDispatchToProps = {
+	createEventAction,
+	updateEventAction
+};
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(EventForm);
