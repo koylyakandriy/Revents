@@ -5,11 +5,17 @@ class EventList extends Component {
 	state = {};
 
 	render() {
+		const { events, deleteEvent } = this.props;
+
 		return (
 			<Fragment>
-				<EventListItem />
-				<EventListItem />
-				<EventListItem />
+				{events.map(event => (
+					<EventListItem
+						key={event.id}
+						event={event}
+						deleteEvent={deleteEvent}
+					/>
+				))}
 			</Fragment>
 		);
 	}

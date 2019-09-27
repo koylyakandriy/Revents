@@ -5,14 +5,13 @@ class EventListAttendee extends Component {
 	state = {};
 
 	render() {
+		const {
+			attendee: { photoURL }
+		} = this.props;
+
 		return (
 			<List.Item>
-				<Image
-					as='a'
-					size='mini'
-					circular
-					src='https://randomuser.me/api/portraits/women/42.jpg'
-				/>
+				<Image as='a' size='mini' circular src={photoURL} />
 			</List.Item>
 		);
 	}

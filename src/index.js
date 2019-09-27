@@ -1,13 +1,30 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./app/layout/App";
+import { BrowserRouter as Router } from "react-router-dom";
+import { Provider } from "react-redux";
+
 import * as serviceWorker from "./serviceWorker";
+import App from "./app/layout/App";
+import { configureStore } from "./app/store/configureStore";
+import ScrollToTop from "./app/common/utill/ScrollToTop";
+
+import "./index.css";
+
+const store = configureStore();
 
 const rootEl = document.getElementById("root");
 
 let render = () => {
-	ReactDOM.render(<App />, rootEl);
+	ReactDOM.render(
+		<Provider store={store}>
+			<Router>
+				<ScrollToTop>
+					<App />
+				</ScrollToTop>
+			</Router>
+		</Provider>,
+		rootEl
+	);
 };
 
 if (module.hot) {
@@ -17,8 +34,6 @@ if (module.hot) {
 }
 
 render();
-
-ReactDOM.render(<App />, document.getElementById("root"));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
