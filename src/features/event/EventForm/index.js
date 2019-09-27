@@ -1,3 +1,5 @@
+/*global google */
+
 import React, { Component } from "react";
 import { Button, Segment, Form, Grid, Header } from "semantic-ui-react";
 import { connect } from "react-redux";
@@ -15,6 +17,10 @@ import TextInput from "../../../app/common/form/TextInput";
 import TextArea from "../../../app/common/form/TextArea";
 import SelectInput from "../../../app/common/form/SelectInput";
 import DateInput from "../../../app/common/form/DateInput";
+
+/*  //  Uncomment if you need use google places API
+import PlaceInput from "../../../app/common/form/PlaceInput";
+import { geocodeByAddress, getLatLng } from "react-places-autocomplete";*/
 
 const validate = combineValidators({
 	title: isRequired({ message: "The event title is required" }),
@@ -40,15 +46,28 @@ const category = [
 ];
 
 class EventForm extends Component {
-	state = {};
+	state = {
+		cityLatLng: {},
+		venueLatLng: {}
+	};
 
 	onFormSubmit = values => {
+		/*	
+			//  Uncomment if you need use google places API
+			const { cityLatLng, venueLatLng } = this.state;
+		*/
+
 		const {
 			createEventAction,
 			updateEventAction,
 			history,
 			initialValues
 		} = this.props;
+
+		/*	
+			//  Uncomment if you need use google places API
+			values.venueLatLng = venueLatLng; 
+	*/
 
 		if (initialValues.id) {
 			updateEventAction(values);
@@ -65,6 +84,29 @@ class EventForm extends Component {
 			history.push(`/events/${newEvent.id}`);
 		}
 	};
+
+	/*	//  Uncomment if you need use google places API
+handleCitySelect = selectedCity => {
+	geocodeByAddress(selectedCity)
+		.then(results => getLatLng(results[0]))
+		.then(latlng => {
+			this.setState({ cityLatLng: latlng });
+		})
+		.then(() => {
+			this.props.change("city", selectedCity);
+		});
+};
+
+handleVenueSelect = selectedVenue => {
+	geocodeByAddress(selectedVenue)
+		.then(results => getLatLng(results[0]))
+		.then(latlng => {
+			this.setState({ venueLatLng: latlng });
+		})
+		.then(() => {
+			this.props.change("venue", selectedVenue);
+		});
+};*/
 
 	render() {
 		const {
@@ -104,11 +146,35 @@ class EventForm extends Component {
 								component={TextInput}
 								placeholder='Event City'
 							/>
+
 							<Field
 								name='venue'
 								component={TextInput}
 								placeholder='Event Venue'
 							/>
+
+							{/*		Uncomment if you need use google places API
+							Limit to request one per day, but free
+							<Field
+								name='city'
+								component={PlaceInput}
+								options={{ types: ["(cities)"] }}
+								onSelect={this.handleCitySelect}
+								placeholder='Event Google City'
+							/>
+
+							<Field
+								name='venue'
+								component={PlaceInput}
+								options={{
+									location: new google.maps.LatLng(this.state.cityLatLng),
+									radius: 1000,
+									types: ["establishment"]
+								}}
+								onSelect={this.handleVenueSelect}
+								placeholder='Event Google Venue'
+							/>*/}
+
 							<Field
 								name='date'
 								component={DateInput}

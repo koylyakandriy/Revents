@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 
 import { decrementCounter, incrementCounter } from "./testActions";
 import { Button } from "semantic-ui-react";
+import TestPlaceInput from "./TestPlaceInput";
 
 const mapStateToProps = state => ({
 	data: state.test.data
@@ -24,6 +25,8 @@ class TestComponent extends Component {
 				<h3>The number is: {this.props.data}</h3>
 				<Button onClick={incrementCounter} positive content='Increment' />
 				<Button onClick={decrementCounter} negative content='Decrement' />
+				<br/><br/>
+				<TestPlaceInput />
 			</div>
 		);
 	}
