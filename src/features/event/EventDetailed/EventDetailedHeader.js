@@ -19,6 +19,7 @@ const eventImageTextStyle = {
 const EventDetailedHeader = ({
 	event: { id, category, title, date, hostedBy }
 }) => {
+	console.log("date:", date);
 	return (
 		<Segment.Group>
 			<Segment basic attached='top' style={{ padding: "0" }}>
@@ -37,7 +38,7 @@ const EventDetailedHeader = ({
 									content={title}
 									style={{ color: "white" }}
 								/>
-								<p>{date}</p>
+								{date && <p>{date}</p>}
 								<p>
 									Hosted by <strong>{hostedBy}</strong>
 								</p>

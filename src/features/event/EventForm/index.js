@@ -16,11 +16,11 @@ import { createEventAction, updateEventAction } from "../eventActions";
 import TextInput from "../../../app/common/form/TextInput";
 import TextArea from "../../../app/common/form/TextArea";
 import SelectInput from "../../../app/common/form/SelectInput";
-import DateInput from "../../../app/common/form/DateInput";
+// import DateInput from "../../../app/common/form/DateInput";
 
-/*  //  Uncomment if you need use google places API
+//  Uncomment if you need use google places API
 import PlaceInput from "../../../app/common/form/PlaceInput";
-import { geocodeByAddress, getLatLng } from "react-places-autocomplete";*/
+import { geocodeByAddress, getLatLng } from "react-places-autocomplete";
 
 const validate = combineValidators({
 	title: isRequired({ message: "The event title is required" }),
@@ -52,10 +52,8 @@ class EventForm extends Component {
 	};
 
 	onFormSubmit = values => {
-		/*	
-			//  Uncomment if you need use google places API
-			const { cityLatLng, venueLatLng } = this.state;
-		*/
+		//  Uncomment if you need use google places API
+		const { venueLatLng } = this.state;
 
 		const {
 			createEventAction,
@@ -64,10 +62,8 @@ class EventForm extends Component {
 			initialValues
 		} = this.props;
 
-		/*	
-			//  Uncomment if you need use google places API
-			values.venueLatLng = venueLatLng; 
-	*/
+		//  Uncomment if you need use google places API
+		values.venueLatLng = venueLatLng;
 
 		if (initialValues.id) {
 			updateEventAction(values);
@@ -77,6 +73,7 @@ class EventForm extends Component {
 				...values,
 				id: cuid(),
 				hostPhotoURL: "/assets/user.png",
+				//temporary
 				hostedBy: "Bob"
 			};
 			createEventAction(newEvent);
@@ -85,28 +82,28 @@ class EventForm extends Component {
 		}
 	};
 
-	/*	//  Uncomment if you need use google places API
-handleCitySelect = selectedCity => {
-	geocodeByAddress(selectedCity)
-		.then(results => getLatLng(results[0]))
-		.then(latlng => {
-			this.setState({ cityLatLng: latlng });
-		})
-		.then(() => {
-			this.props.change("city", selectedCity);
-		});
-};
+	//  Uncomment if you need use google places API
+	handleCitySelect = selectedCity => {
+		geocodeByAddress(selectedCity)
+			.then(results => getLatLng(results[0]))
+			.then(latlng => {
+				this.setState({ cityLatLng: latlng });
+			})
+			.then(() => {
+				this.props.change("city", selectedCity);
+			});
+	};
 
-handleVenueSelect = selectedVenue => {
-	geocodeByAddress(selectedVenue)
-		.then(results => getLatLng(results[0]))
-		.then(latlng => {
-			this.setState({ venueLatLng: latlng });
-		})
-		.then(() => {
-			this.props.change("venue", selectedVenue);
-		});
-};*/
+	handleVenueSelect = selectedVenue => {
+		geocodeByAddress(selectedVenue)
+			.then(results => getLatLng(results[0]))
+			.then(latlng => {
+				this.setState({ venueLatLng: latlng });
+			})
+			.then(() => {
+				this.props.change("venue", selectedVenue);
+			});
+	};
 
 	render() {
 		const {
@@ -141,20 +138,21 @@ handleVenueSelect = selectedVenue => {
 								placeholder='Tell us about your event'
 							/>
 							<Header sub color='teal' content='Event Location Details' />
-							<Field
+
+							{/* without google form */}
+							{/*<Field
 								name='city'
 								component={TextInput}
 								placeholder='Event City'
 							/>
-
 							<Field
 								name='venue'
 								component={TextInput}
 								placeholder='Event Venue'
-							/>
+							/>*/}
+							{/*Uncomment if you need use google places API*/}
+							{/*Limit to request one per day, but free*/}
 
-							{/*		Uncomment if you need use google places API
-							Limit to request one per day, but free
 							<Field
 								name='city'
 								component={PlaceInput}
@@ -162,7 +160,6 @@ handleVenueSelect = selectedVenue => {
 								onSelect={this.handleCitySelect}
 								placeholder='Event Google City'
 							/>
-
 							<Field
 								name='venue'
 								component={PlaceInput}
@@ -173,17 +170,13 @@ handleVenueSelect = selectedVenue => {
 								}}
 								onSelect={this.handleVenueSelect}
 								placeholder='Event Google Venue'
-							/>*/}
-
-							<Field
-								name='date'
-								component={DateInput}
-								placeholder='Event Date'
-								dateFormat='dd LLL yyyy h:mm a'
-								timeFormat='HH:mm'
-								showTimeSelect
 							/>
-
+							{/*<Field*/}
+							{/*	name='date'*/}
+							{/*	component={DateInput}*/}
+							{/*	placeholder='Event Date'*/}
+							{/*	dateFormat='dd LLL yyyy'*/}
+							{/*/>*/}
 							<Button
 								disabled={invalid || submitting || pristine}
 								positive

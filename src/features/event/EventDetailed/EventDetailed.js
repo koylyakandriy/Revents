@@ -8,6 +8,7 @@ import EventDetailedChat from "./EventDetailedChat";
 import EventDetailedSidebar from "./EventDetailedSidebar";
 
 const EventDetailed = ({ event }) => {
+	console.log("event:", event);
 	return (
 		<Grid>
 			<Grid.Column width={10}>
