@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { Button, Grid, Icon, Segment } from "semantic-ui-react";
+import { format, parseISO } from "date-fns";
 
 import EventDetailedMap from "./EventDetailedMap";
 
 const EventDetailedInfo = ({
-	event: { description, date, venue, venueLatLng },
-	event
+	event: { description, date, venue, venueLatLng }
 }) => {
-	console.log("event:", event);
-
 	const [isMapOpen, showMapToggle] = useState(false);
 	return (
 		<Segment.Group>
@@ -29,7 +27,10 @@ const EventDetailedInfo = ({
 							<Icon name='calendar' size='large' color='teal' />
 						</Grid.Column>
 						<Grid.Column width={15}>
-							<span>{date}</span>
+							{date && <span>
+								{format(parseISO(date), "EEEE do LLL")} at{" "}
+								{format(parseISO(date), "h:mm a")}
+							</span>}
 						</Grid.Column>
 					</Grid>
 				</Segment>

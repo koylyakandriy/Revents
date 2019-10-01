@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 import { Button, Header, Image, Item, Segment } from "semantic-ui-react";
+import { format, parseISO } from "date-fns";
 
 const eventImageStyle = {
 	filter: "brightness(30%)"
@@ -19,7 +20,6 @@ const eventImageTextStyle = {
 const EventDetailedHeader = ({
 	event: { id, category, title, date, hostedBy }
 }) => {
-	console.log("date:", date);
 	return (
 		<Segment.Group>
 			<Segment basic attached='top' style={{ padding: "0" }}>
@@ -38,7 +38,7 @@ const EventDetailedHeader = ({
 									content={title}
 									style={{ color: "white" }}
 								/>
-								{date && <p>{date}</p>}
+								<p> {date && format(parseISO(date), "EEEE do LLLL")}</p>
 								<p>
 									Hosted by <strong>{hostedBy}</strong>
 								</p>
