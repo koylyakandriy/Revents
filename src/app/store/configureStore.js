@@ -8,9 +8,10 @@ import rootReducer from "../reducers/rootReducer";
 import firebase from "../config/firebase";
 
 const rrfConfig = {
-	userProfiles: "users",
+	userProfile: "users",
 	attachAuthIsReady: true,
-	useFirestoreForProfile: true
+	useFirestoreForProfile: true,
+	updateProfileOnLogin: false
 };
 
 export const configureStore = () => {
