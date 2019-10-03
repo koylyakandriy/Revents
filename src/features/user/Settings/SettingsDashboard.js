@@ -9,15 +9,37 @@ import AboutPage from "./AboutPage";
 import PhotosPage from "./PhotosPage";
 import AccountPage from "./AccountPage";
 import { updatePasswordAction } from "../../auth/authActions";
+import { updateProfileAction } from "../userActions";
 
-const SettingsDashboard = ({ updatePasswordAction, providerId }) => {
+const SettingsDashboard = ({
+	updatePasswordAction,
+	providerId,
+	user,
+	updateProfileAction
+}) => {
 	return (
 		<Grid>
 			<Grid.Column width={12}>
 				<Switch>
 					<Redirect exact from='/settings' to='/settings/basic' />
-					<Route path='/settings/basic' component={BasicPage} />
-					<Route path='/settings/about' component={AboutPage} />
+					<Route
+						path='/settings/basic'
+						render={() => (
+							<BasicPage
+								initialValues={user}
+								updateProfile={updateProfileAction}
+							/>
+						)}
+					/>
+					<Route
+						path='/settings/about'
+						render={() => (
+							<AboutPage
+								initialValues={user}
+								updateProfile={updateProfileAction}
+							/>
+						)}
+					/>
 					<Route path='/settings/photos' component={PhotosPage} />
 					<Route
 						path='/settings/account'
@@ -38,11 +60,13 @@ const SettingsDashboard = ({ updatePasswordAction, providerId }) => {
 };
 
 const mapStateToProps = state => ({
-	providerId: state.firebase.auth.providerData[0].providerId
+	providerId: state.firebase.auth.providerData[0].providerId,
+	user: state.firebase.profile
 });
 
 const mapDispatchToProps = {
-	updatePasswordAction
+	updatePasswordAction,
+	updateProfileAction
 };
 
 export default connect(
