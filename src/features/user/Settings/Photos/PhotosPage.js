@@ -7,14 +7,20 @@ import { compose } from "redux";
 
 import DropzoneInput from "./DropzoneInput";
 import CropperInput from "./CropperInput";
-import { uploadProfileImageAction, deletePhotoAction } from "../../userActions";
+import {
+	uploadProfileImageAction,
+	deletePhotoAction,
+	setMainPhotoAction
+} from "../../userActions";
 import UserPhotos from "./UserPhotos";
 
 const PhotosPage = ({
 	uploadProfileImageAction,
 	photos,
 	profile,
-	deletePhotoAction
+	deletePhotoAction,
+	setMainPhotoAction,
+	loading
 }) => {
 	const [files, setFiles] = useState([]);
 	const [image, setImage] = useState([null]);
@@ -50,6 +56,14 @@ const PhotosPage = ({
 		}
 	};
 
+	const handleSetMainPhoto = async photo => {
+		try {
+			await setMainPhotoAction(photo);
+		} catch (err) {
+			toastr.error("Oopss", err.message);
+		}
+	};
+
 	return (
 		<Segment>
 			<Header dividing size='large' content='Your Photos' />
@@ -81,12 +95,14 @@ const PhotosPage = ({
 							/>
 							<Button.Group>
 								<Button
+									loading={loading}
 									onClick={handleUploadImage}
 									style={{ width: "100px" }}
 									positive
 									icon='check'
 								/>
 								<Button
+									disabled={loading}
 									onClick={handleCancelCrop}
 									style={{ width: "100px" }}
 									icon='close'
@@ -102,6 +118,7 @@ const PhotosPage = ({
 				photos={photos}
 				profile={profile}
 				deletePhoto={handleDeletePhoto}
+				setMainPhoto={handleSetMainPhoto}
 			/>
 		</Segment>
 	);
@@ -121,12 +138,14 @@ const query = ({ auth }) => {
 const mapStateToProps = state => ({
 	auth: state.firebase.auth,
 	profile: state.firebase.profile,
-	photos: state.firestore.ordered.photos
+	photos: state.firestore.ordered.photos,
+	loading: state.async.loading
 });
 
 const mapDispatchToProps = {
 	uploadProfileImageAction,
-	deletePhotoAction
+	deletePhotoAction,
+	setMainPhotoAction
 };
 
 export default compose(

@@ -84,7 +84,7 @@ export const deletePhotoAction = photo => async (
 	const firestore = getFirestore();
 	const user = firebase.auth().currentUser;
 	try {
-		await firebase.deleteFile(`${user.uid}/user_images/${photo.name}}`);
+		await firebase.deleteFile(`${user.uid}/user_images/${photo.name}`);
 		await firestore.delete({
 			collection: "users",
 			doc: user.uid,
@@ -93,5 +93,21 @@ export const deletePhotoAction = photo => async (
 	} catch (err) {
 		console.log("err", err);
 		throw new Error("Problem deleting photo");
+	}
+};
+
+export const setMainPhotoAction = photo => async (
+	dispatch,
+	getState,
+	{ getFirebase }
+) => {
+	const firebase = getFirebase();
+	try {
+		return await firebase.updateProfile({
+			photoURL: photo.url
+		});
+	} catch (err) {
+		console.log("err", err);
+		throw new Error("Problem setting main photo");
 	}
 };
