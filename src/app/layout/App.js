@@ -7,7 +7,7 @@ import EventDashboard from "../../features/event/EventDashboard";
 import NavBar from "../../features/nav/NavBar";
 import EventDetailed from "../../features/event/EventDetailed/EventDetailed";
 import PeopleDashboard from "../../features/user/PeopleDashboard";
-import UserDetailed from "../../features/user/UserDetailed";
+import UserDetailedPage from "../../features/user/UserDetailed/UserDetailedPage";
 import SettingsDashboard from "../../features/user/Settings/SettingsDashboard";
 import EventForm from "../../features/event/EventForm";
 import TestComponent from "../../features/testarea/TestComponent";
@@ -30,7 +30,7 @@ class App extends Component {
 									<Route exact path='/events' component={EventDashboard} />
 									<Route path='/events/:id' component={EventDetailed} />
 									<Route path='/people' component={PeopleDashboard} />
-									<Route path='/profile/:id' component={UserDetailed} />
+									<Route path='/profile/:id' component={UserDetailedPage} />
 									<Route path='/settings' component={SettingsDashboard} />
 									<Route
 										path={["/createEvent", "/manage/:id"]}
