@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import SettingsNav from "./SettingsNav";
 import BasicPage from "./BasicPage";
 import AboutPage from "./AboutPage";
-import PhotosPage from "./PhotosPage";
+import PhotosPage from "./Photos/PhotosPage";
 import AccountPage from "./AccountPage";
 import { updatePasswordAction } from "../../auth/authActions";
 import { updateProfileAction } from "../userActions";
