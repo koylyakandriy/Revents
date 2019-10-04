@@ -39,7 +39,7 @@ class UserDetailedPage extends Component {
 const mapStateToProps = state => ({
 	profile: state.firebase.profile,
 	auth: state.firebase.auth,
-	photos: state.firebase.ordered.photos
+	photos: state.firestore.ordered.photos,
 });
 
 export default compose(

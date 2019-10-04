@@ -2,7 +2,6 @@
 import React, { Component } from "react";
 import { Button, Segment, Form, Grid, Header } from "semantic-ui-react";
 import { connect } from "react-redux";
-import cuid from "cuid";
 import { reduxForm, Field } from "redux-form";
 import {
 	composeValidators,
@@ -10,16 +9,20 @@ import {
 	isRequired,
 	hasLengthGreaterThan
 } from "revalidate";
+import { withFirestore } from "react-redux-firebase";
+import { geocodeByAddress, getLatLng } from "react-places-autocomplete";
+import { toastr } from "react-redux-toastr";
 
-import { createEventAction, updateEventAction } from "../eventActions";
+import {
+	cancelToggleAction,
+	createEventAction,
+	updateEventAction
+} from "../eventActions";
 import TextInput from "../../../app/common/form/TextInput";
 import TextArea from "../../../app/common/form/TextArea";
 import SelectInput from "../../../app/common/form/SelectInput";
 import DateInput from "../../../app/common/form/DateInput";
-
-//  Uncomment if you need use google places API
 import PlaceInput from "../../../app/common/form/PlaceInput";
-import { geocodeByAddress, getLatLng } from "react-places-autocomplete";
 
 const validate = combineValidators({
 	title: isRequired({ message: "The event title is required" }),
@@ -50,8 +53,20 @@ class EventForm extends Component {
 		venueLatLng: {}
 	};
 
-	onFormSubmit = values => {
-		//  Uncomment if you need use google places API
+	async componentDidMount() {
+		const { firestore, match, history } = this.props;
+		let event = await firestore.get(`events/${match.params.id}`);
+		if (!event.exists) {
+			history.push("/events");
+			toastr.error("Sorry", "Event not found");
+		} else {
+			this.setState({
+				venueLatLng: event.data().venueLatLng
+			});
+		}
+	}
+
+	onFormSubmit = async values => {
 		const { venueLatLng } = this.state;
 
 		const {
@@ -61,27 +76,21 @@ class EventForm extends Component {
 			initialValues
 		} = this.props;
 
-		//  Uncomment if you need use google places API
 		values.venueLatLng = venueLatLng;
 
-		if (initialValues.id) {
-			updateEventAction(values);
-			history.push(`/events/${initialValues.id}`);
-		} else {
-			const newEvent = {
-				...values,
-				id: cuid(),
-				hostPhotoURL: "/assets/user.png",
-				//temporary
-				hostedBy: "Bob"
-			};
-			createEventAction(newEvent);
-
-			history.push(`/events/${newEvent.id}`);
+		try {
+			if (initialValues.id) {
+				updateEventAction(values);
+				history.push(`/events/${initialValues.id}`);
+			} else {
+				let createdEvent = await createEventAction(values);
+				history.push(`/events/${createdEvent.id}`);
+			}
+		} catch (err) {
+			console.log("err", err);
 		}
 	};
 
-	//  Uncomment if you need use google places API
 	handleCitySelect = selectedCity => {
 		geocodeByAddress(selectedCity)
 			.then(results => getLatLng(results[0]))
@@ -111,7 +120,9 @@ class EventForm extends Component {
 			initialValues,
 			invalid,
 			submitting,
-			pristine
+			pristine,
+			event,
+			cancelToggleAction
 		} = this.props;
 		return (
 			<Grid>
@@ -137,21 +148,6 @@ class EventForm extends Component {
 								placeholder='Tell us about your event'
 							/>
 							<Header sub color='teal' content='Event Location Details' />
-
-							{/* without google form */}
-							{/*<Field
-								name='city'
-								component={TextInput}
-								placeholder='Event City'
-							/>
-							<Field
-								name='venue'
-								component={TextInput}
-								placeholder='Event Venue'
-							/>*/}
-							{/*Uncomment if you need use google places API*/}
-							{/*Limit to request one per day, but free*/}
-
 							<Field
 								name='city'
 								component={PlaceInput}
@@ -175,7 +171,7 @@ class EventForm extends Component {
 								component={DateInput}
 								placeholder='Event Date'
 								dateFormat='dd LLL yyyy h:mm a'
-								timeFormat="HH:mm"
+								timeFormat='HH:mm'
 								showTimeSelect
 							/>
 							<Button
@@ -195,6 +191,13 @@ class EventForm extends Component {
 							>
 								Cancel
 							</Button>
+							<Button
+								type='button'
+								color={event.cancelled ? "green" : "red"}
+								floated='right'
+								content={event.cancelled ? "Reactivate event" : "Cancel event"}
+								onClick={() => cancelToggleAction(!event.cancelled, event.id)}
+							/>
 						</Form>
 					</Segment>
 				</Grid.Column>
@@ -208,21 +211,34 @@ const mapStateToProps = (state, ownProps) => {
 
 	let event = {};
 
-	if (eventId && state.events.length > 0) {
-		event = state.events.filter(event => event.id === eventId)[0];
+	if (
+		state.firestore.ordered.events &&
+		state.firestore.ordered.events.length > 0
+	) {
+		event =
+			state.firestore.ordered.events.filter(event => event.id === eventId)[0] ||
+			{};
 	}
 
 	return {
-		initialValues: event
+		initialValues: event,
+		event
 	};
 };
 
 const mapDispatchToProps = {
 	createEventAction,
-	updateEventAction
+	updateEventAction,
+	cancelToggleAction
 };
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(reduxForm({ form: "eventForm", validate })(EventForm));
+export default withFirestore(
+	connect(
+		mapStateToProps,
+		mapDispatchToProps
+	)(
+		reduxForm({ form: "eventForm", validate, enableReinitialize: true })(
+			EventForm
+		)
+	)
+);
