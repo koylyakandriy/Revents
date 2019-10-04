@@ -111,3 +111,4 @@ export const setMainPhotoAction = photo => async (
 		throw new Error("Problem setting main photo");
 	}
 };
+

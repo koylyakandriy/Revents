@@ -1,40 +1,47 @@
 import React from "react";
 import { Grid, Header, Icon, Item, List, Segment } from "semantic-ui-react";
+import format from "date-fns/format";
 
-const UserDetailedDescription = () => {
+const UserDetailedDescription = ({
+	profile: { createdAt, occupation, origin, displayName, interests, about }
+}) => {
+	let sinceFrom;
+	if (createdAt) {
+		sinceFrom = format(createdAt.toDate(), "d MMM yyyy");
+	}
+
 	return (
 		<Grid.Column width={12}>
 			<Segment>
 				<Grid columns={2}>
 					<Grid.Column width={10}>
-						<Header icon='smile' content='About Display Name' />
+						<Header icon='smile' content={displayName} />
 						<p>
-							I am a: <strong>Occupation Placeholder</strong>
+							I am a: <strong>{occupation || "tbn"}</strong>
 						</p>
 						<p>
-							Originally from <strong>United Kingdom</strong>
+							Originally from <strong>{origin || "tbn"}</strong>
 						</p>
 						<p>
-							Member Since: <strong>28th March 2018</strong>
+							Member Since: <strong>{sinceFrom}</strong>
 						</p>
-						<p>Description of user</p>
+						<p>{about}</p>
 					</Grid.Column>
 					<Grid.Column width={6}>
 						<Header icon='heart outline' content='Interests' />
-						<List>
-							<Item>
-								<Icon name='heart' />
-								<Item.Content>Interest 1</Item.Content>
-							</Item>
-							<Item>
-								<Icon name='heart' />
-								<Item.Content>Interest 2</Item.Content>
-							</Item>
-							<Item>
-								<Icon name='heart' />
-								<Item.Content>Interest 3</Item.Content>
-							</Item>
-						</List>
+						{interests ? (
+							<List>
+								{interests &&
+									interests.map(interest => (
+										<Item key={interest}>
+											<Icon name='heart' />
+											<Item.Content>{interest}</Item.Content>
+										</Item>
+									))}
+							</List>
+						) : (
+							<p>No interests</p>
+						)}
 					</Grid.Column>
 				</Grid>
 			</Segment>

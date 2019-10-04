@@ -1,7 +1,18 @@
 import React from "react";
 import { Grid, Header, Item, Segment } from "semantic-ui-react";
+import { differenceInYears } from "date-fns";
 
-const UserDetailedHeader = () => {
+const UserDetailedHeader = ({
+	profile: { displayName, dateOfBirth, occupation, city, photoURL }
+}) => {
+	let age;
+
+	if (dateOfBirth) {
+		age = differenceInYears(Date.now(), dateOfBirth.toDate());
+	} else {
+		age = "unknown age";
+	}
+
 	return (
 		<Grid.Column width={16}>
 			<Segment>
@@ -10,14 +21,16 @@ const UserDetailedHeader = () => {
 						<Item.Image
 							avatar
 							size='small'
-							src='https://randomuser.me/api/portraits/men/20.jpg'
+							src={photoURL || "/assets/user.png"}
 						/>
 						<Item.Content verticalAlign='bottom'>
-							<Header as='h1'>First Name</Header>
+							<Header as='h1'>{displayName}</Header>
 							<br />
-							<Header as='h3'>Occupation</Header>
+							<Header as='h3'>{occupation}</Header>
 							<br />
-							<Header as='h3'>27, Lives in London, UK</Header>
+							<Header as='h3'>
+								{age}, Lives in {city || "unknown city"}
+							</Header>
 						</Item.Content>
 					</Item>
 				</Item.Group>
