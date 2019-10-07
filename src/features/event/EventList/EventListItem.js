@@ -1,27 +1,26 @@
 import React, { Component } from "react";
-import { Button, Icon, Item, List, Segment } from "semantic-ui-react";
+import { Button, Icon, Item, List, Segment, Label } from "semantic-ui-react";
 import EventListAttendee from "./EventListAttendee";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import { objectToArray } from "../../../app/common/utill/helpers";
 
 class EventListItem extends Component {
 	state = {};
 
 	render() {
+		const { event } = this.props;
 		const {
-			event: {
-				id,
-				title,
-				date,
-				venue,
-				description,
-				hostPhotoURL,
-				hostedBy,
-				attendees
-			},
-			event,
-			deleteEvent
-		} = this.props;
+			title,
+			date,
+			venue,
+			description,
+			hostPhotoURL,
+			hostedBy,
+			attendees,
+			id,
+			hostUid
+		} = event;
 		return (
 			<Segment.Group>
 				<Segment>
@@ -29,10 +28,20 @@ class EventListItem extends Component {
 						<Item>
 							<Item.Image size='tiny' circular src={hostPhotoURL} />
 							<Item.Content>
-								<Item.Header as='a'>{title}</Item.Header>
+								<Item.Header as={Link} to={`/events/${id}`}>
+									{title}
+								</Item.Header>{" "}
 								<Item.Description>
-									Hosted by <a href='#!'>{hostedBy}</a>
+									Hosted by <Link to={`/profile/${hostUid}`}>{hostedBy}</Link>
 								</Item.Description>
+								{event.cancelled && (
+									<Label
+										style={{ top: "-40px" }}
+										ribbon='right'
+										color='red'
+										content='This event has benn cancelled'
+									/>
+								)}
 							</Item.Content>
 						</Item>
 					</Item.Group>
@@ -47,20 +56,13 @@ class EventListItem extends Component {
 				<Segment secondary>
 					<List horizontal>
 						{attendees &&
-							Object.values(attendees).map((attendee, index) => (
-								<EventListAttendee key={index} attendee={attendee} />
+							objectToArray(attendees).map(attendee => (
+								<EventListAttendee key={attendee.id} attendee={attendee} />
 							))}
 					</List>
 				</Segment>
 				<Segment clearing>
 					<span>{description}</span>
-					<Button
-						onClick={() => deleteEvent(id)}
-						as='a'
-						color='red'
-						floated='right'
-						content='Delete'
-					/>
 					<Button
 						// onClick={() => selectEvent(event)}
 						as={Link}

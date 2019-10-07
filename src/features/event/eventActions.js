@@ -1,12 +1,5 @@
 import { toastr } from "react-redux-toastr";
 
-import { DELETE_EVENT, FETCH_EVENTS, UPDATE_EVENT } from "./eventConstants";
-import {
-	asyncErrorAction,
-	asyncFinishAction,
-	asyncStartAction
-} from "../async/asyncActions";
-import { fetchSampleData } from "../../app/data/mockApi";
 import { createNewEvent } from "../../app/common/utill/helpers";
 
 export const createEventAction = event => {
@@ -50,32 +43,16 @@ export const cancelToggleAction = (cancelled, eventId) => async (
 	{ getFirestore }
 ) => {
 	const firestore = getFirestore();
+	const message = cancelled
+		? "Are you sure you want to cancel the event?"
+		: "This will reactivate the event, are you sure?";
 
 	try {
-		await firestore.update(`events/${eventId}`, { cancelled: cancelled });
+		toastr.confirm(message, {
+			onOk: async () =>
+				await firestore.update(`events/${eventId}`, { cancelled: cancelled })
+		});
 	} catch (err) {
 		console.log("err", err);
 	}
-};
-
-export const deleteEventAction = eventId => {
-	return {
-		type: DELETE_EVENT,
-		payload: { eventId }
-	};
-};
-
-export const loadEvents = () => {
-	return async dispatch => {
-		try {
-			dispatch(asyncStartAction());
-
-			const events = await fetchSampleData();
-
-			dispatch({ type: FETCH_EVENTS, payload: { events } });
-			dispatch(asyncFinishAction());
-		} catch (err) {
-			dispatch(asyncErrorAction());
-		}
-	};
 };
