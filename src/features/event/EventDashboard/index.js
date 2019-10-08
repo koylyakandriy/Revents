@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import { Grid, Loader } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { firestoreConnect } from "react-redux-firebase";
@@ -8,7 +8,17 @@ import { getEventForDashboardAction } from "../eventActions";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
 import EventActivity from "../EventActivity";
 
+const query = [
+	{
+		collection: "activity",
+		orderBy: ["timestamp", "desc"],
+		limit: 5
+	}
+];
+
 class EventDashboard extends Component {
+	contextRef = createRef();
+
 	state = {
 		moreEvents: false,
 		loadingInitial: true,
@@ -50,22 +60,24 @@ class EventDashboard extends Component {
 
 	render() {
 		const { loadingInitial, loadedEvents, moreEvents } = this.state;
-		const { loading } = this.props;
+		const { loading, activities } = this.props;
 
 		if (loadingInitial) return <LoadingComponent />;
 		return (
 			<Grid>
 				<Grid.Column width={10}>
-					<EventList
-						events={loadedEvents}
-						getNextEvents={this.getNextEvents}
-						moreEvents={moreEvents}
-						loading={loading}
-					/>
+					<div ref={this.contextRef}>
+						<EventList
+							events={loadedEvents}
+							getNextEvents={this.getNextEvents}
+							moreEvents={moreEvents}
+							loading={loading}
+						/>
+					</div>
 				</Grid.Column>
 
 				<Grid.Column width={6}>
-					<EventActivity />
+					<EventActivity activities={activities} contextRef={this.contextRef}/>
 				</Grid.Column>
 				<Grid.Column width={10}>
 					<Loader active={loading} />
@@ -77,7 +89,8 @@ class EventDashboard extends Component {
 
 const mapStateToProps = state => ({
 	events: state.events,
-	loading: state.async.loading
+	loading: state.async.loading,
+	activities: state.firestore.ordered.activity
 });
 
 const mapDispatchToProps = {
@@ -87,4 +100,4 @@ const mapDispatchToProps = {
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(firestoreConnect([{ collection: "events" }])(EventDashboard));
+)(firestoreConnect(query)(EventDashboard));
