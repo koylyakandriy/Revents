@@ -37,7 +37,7 @@ const PhotosPage = ({
 			handleCancelCrop();
 			toastr.success("Success", "Photo has benn uploaded");
 		} catch (err) {
-			console.log("err", err);
+			console.log(err);
 			toastr.error("Oops", "Something went wrong");
 		}
 	};
@@ -51,7 +51,7 @@ const PhotosPage = ({
 		try {
 			await deletePhotoAction(photo);
 		} catch (err) {
-			console.log("err", err);
+			console.log(err);
 			toastr.error("Oops", err.message);
 		}
 	};

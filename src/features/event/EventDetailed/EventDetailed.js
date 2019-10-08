@@ -1,17 +1,22 @@
 import React, { Component } from "react";
 import { Grid } from "semantic-ui-react";
 import { connect } from "react-redux";
-import { withFirestore } from "react-redux-firebase";
+import { withFirestore, firebaseConnect, isEmpty } from "react-redux-firebase";
+import { compose } from "redux";
 
 import EventDetailedHeader from "./EventDetailedHeader";
 import EventDetailedInfo from "./EventDetailedInfo";
 import EventDetailedChat from "./EventDetailedChat";
 import EventDetailedSidebar from "./EventDetailedSidebar";
-import { objectToArray } from "../../../app/common/utill/helpers";
+import {
+	objectToArray,
+	createDataTree
+} from "../../../app/common/utill/helpers";
 import {
 	goingToEventAction,
 	cancelGoingEventAction
 } from "../../user/userActions";
+import { addEventCommentAction } from "../eventActions";
 
 class EventDetailed extends Component {
 	async componentDidMount() {
@@ -25,11 +30,19 @@ class EventDetailed extends Component {
 	}
 
 	render() {
-		const { event, auth, goingToEventAction, cancelGoingEventAction } = this.props;
+		const {
+			event,
+			auth,
+			goingToEventAction,
+			cancelGoingEventAction,
+			addEventCommentAction,
+			eventChat
+		} = this.props;
 		const attendees =
 			event && event.attendees && objectToArray(event.attendees);
 		const isHost = event.hostUid === auth.uid;
 		const isGoing = attendees && attendees.some(a => a.id === auth.uid);
+		const chatTree = !isEmpty(eventChat) && createDataTree(eventChat);
 		return (
 			<Grid>
 				<Grid.Column width={10}>
@@ -41,7 +54,11 @@ class EventDetailed extends Component {
 						cancelGoingEvent={cancelGoingEventAction}
 					/>
 					<EventDetailedInfo event={event} />
-					<EventDetailedChat />
+					<EventDetailedChat
+						addEventComment={addEventCommentAction}
+						eventId={event.id}
+						eventChat={chatTree}
+					/>
 				</Grid.Column>
 				<Grid.Column width={6}>
 					<EventDetailedSidebar attendees={attendees} />
@@ -62,17 +79,26 @@ const mapStateToProps = (state, ownProps) => {
 			state.firestore.ordered.events.filter(event => event.id === eventId)[0] ||
 			{};
 	}
-	return { event, auth: state.firebase.auth };
+	return {
+		event,
+		auth: state.firebase.auth,
+		eventChat:
+			!isEmpty(state.firebase.data.event_chat) &&
+			objectToArray(state.firebase.data.event_chat[ownProps.match.params.id])
+	};
 };
 
 const mapDispatchToProps = {
 	goingToEventAction,
-	cancelGoingEventAction
+	cancelGoingEventAction,
+	addEventCommentAction
 };
 
-export default withFirestore(
+export default compose(
+	withFirestore,
 	connect(
 		mapStateToProps,
 		mapDispatchToProps
-	)(EventDetailed)
-);
+	),
+	firebaseConnect(props => [`event_chat/${props.match.params.id}`])
+)(EventDetailed);

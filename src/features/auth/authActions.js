@@ -73,7 +73,7 @@ export const socialLoginAction = selectedProvider => async (
 			});
 		}
 	} catch (err) {
-		console.log("err", err);
+		console.log(err);
 	}
 };
 

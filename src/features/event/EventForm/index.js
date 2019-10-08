@@ -87,7 +87,7 @@ class EventForm extends Component {
 				history.push(`/events/${createdEvent.id}`);
 			}
 		} catch (err) {
-			console.log("err", err);
+			console.log(err);
 		}
 	};
 
