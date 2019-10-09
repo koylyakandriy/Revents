@@ -61,8 +61,8 @@ class EventDashboard extends Component {
 	render() {
 		const { loadingInitial, loadedEvents, moreEvents } = this.state;
 		const { loading, activities } = this.props;
-
 		if (loadingInitial) return <LoadingComponent />;
+		
 		return (
 			<Grid>
 				<Grid.Column width={10}>

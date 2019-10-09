@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { geocodeByAddress, getLatLng } from "react-places-autocomplete";
 import { Button } from "semantic-ui-react";
+import { toastr } from "react-redux-toastr";
+import firebase from "../../app/config/firebase";
 
 import {
 	decrementAsync,

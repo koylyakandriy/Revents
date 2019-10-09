@@ -17,6 +17,9 @@ import {
 	cancelGoingEventAction
 } from "../../user/userActions";
 import { addEventCommentAction } from "../eventActions";
+import { openModalAction } from "../../modals/modalActions";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
+import NotFound from "../../../app/layout/NotFound";
 
 class EventDetailed extends Component {
 	async componentDidMount() {
@@ -37,13 +40,22 @@ class EventDetailed extends Component {
 			cancelGoingEventAction,
 			addEventCommentAction,
 			eventChat,
-			loading
+			loading,
+			openModalAction,
+			requesting,
+			match,
 		} = this.props;
 		const attendees =
 			event && event.attendees && objectToArray(event.attendees);
 		const isHost = event.hostUid === auth.uid;
 		const isGoing = attendees && attendees.some(a => a.id === auth.uid);
 		const chatTree = !isEmpty(eventChat) && createDataTree(eventChat);
+		const authenticated = auth.isLoaded && !auth.isEmpty;
+		const loadingEvent = requesting[`events/${match.params.id}`];
+
+		if (loadingEvent) return <LoadingComponent />;
+		if (Object.keys(event).length === 0) return <NotFound />;
+
 		return (
 			<Grid>
 				<Grid.Column width={10}>
@@ -54,13 +66,17 @@ class EventDetailed extends Component {
 						isHost={isHost}
 						goingToEvent={goingToEventAction}
 						cancelGoingEvent={cancelGoingEventAction}
+						authenticated={authenticated}
+						openModal={openModalAction}
 					/>
 					<EventDetailedInfo event={event} />
-					<EventDetailedChat
-						addEventComment={addEventCommentAction}
-						eventId={event.id}
-						eventChat={chatTree}
-					/>
+					{authenticated && (
+						<EventDetailedChat
+							addEventComment={addEventCommentAction}
+							eventId={event.id}
+							eventChat={chatTree}
+						/>
+					)}
 				</Grid.Column>
 				<Grid.Column width={6}>
 					<EventDetailedSidebar attendees={attendees} />
@@ -85,6 +101,7 @@ const mapStateToProps = (state, ownProps) => {
 		event,
 		loading: state.async.loading,
 		auth: state.firebase.auth,
+		requesting: state.firestore.status.requesting,
 		eventChat:
 			!isEmpty(state.firebase.data.event_chat) &&
 			objectToArray(state.firebase.data.event_chat[ownProps.match.params.id])
@@ -94,7 +111,8 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = {
 	goingToEventAction,
 	cancelGoingEventAction,
-	addEventCommentAction
+	addEventCommentAction,
+	openModalAction
 };
 
 export default compose(

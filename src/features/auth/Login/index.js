@@ -7,7 +7,13 @@ import TextInput from "../../../app/common/form/TextInput";
 import { loginAction, socialLoginAction } from "../authActions";
 import SocialLogin from "../SocialLogin";
 
-const LoginForm = ({ loginAction, socialLoginAction, handleSubmit, error }) => {
+const LoginForm = ({
+	loginAction,
+	socialLoginAction,
+	handleSubmit,
+	error,
+	submitting
+}) => {
 	return (
 		<Form
 			error
@@ -33,7 +39,7 @@ const LoginForm = ({ loginAction, socialLoginAction, handleSubmit, error }) => {
 						{error}
 					</Label>
 				)}
-				<Button fluid size='large' color='teal'>
+				<Button loading={submitting} fluid size='large' color='teal'>
 					Login
 				</Button>
 				<Divider horizontal>Or</Divider>
