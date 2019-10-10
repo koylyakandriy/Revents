@@ -3,6 +3,7 @@ import { Grid } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { withFirestore, firebaseConnect, isEmpty } from "react-redux-firebase";
 import { compose } from "redux";
+import moment from "moment";
 
 import EventDetailedHeader from "./EventDetailedHeader";
 import EventDetailedInfo from "./EventDetailedInfo";
@@ -43,10 +44,14 @@ class EventDetailed extends Component {
 			loading,
 			openModalAction,
 			requesting,
-			match,
+			match
 		} = this.props;
 		const attendees =
-			event && event.attendees && objectToArray(event.attendees);
+			event &&
+			event.attendees &&
+			objectToArray(event.attendees).sort((a, b) => {
+				return moment(a.joinDate).toDate() - moment(b.joinDate).toDate();
+			});
 		const isHost = event.hostUid === auth.uid;
 		const isGoing = attendees && attendees.some(a => a.id === auth.uid);
 		const chatTree = !isEmpty(eventChat) && createDataTree(eventChat);

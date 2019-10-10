@@ -7,7 +7,7 @@ import {
 	asyncStartAction
 } from "../async/asyncActions";
 import firebase from "../../app/config/firebase";
-import { FETCH_EVENTS } from "../event/eventConstants";
+import { FETCH_USER_EVENTS } from "../event/eventConstants";
 
 export const updateProfileAction = user => async (
 	dispatch,
@@ -16,6 +16,7 @@ export const updateProfileAction = user => async (
 ) => {
 	const firebase = getFirebase();
 	const { isLoaded, isEmpty, ...updatedUser } = user;
+
 	try {
 		await firebase.updateProfile(updatedUser);
 		toastr.success("Success", "Your  profile has been updated");
@@ -37,6 +38,7 @@ export const uploadProfileImageAction = (file, fileName) => async (
 	const options = {
 		name: imageName
 	};
+
 	try {
 		dispatch(asyncStartAction());
 		//  upload the file to firebase storage
@@ -85,6 +87,7 @@ export const deletePhotoAction = photo => async (
 	const firebase = getFirebase();
 	const firestore = getFirestore();
 	const user = firebase.auth().currentUser;
+
 	try {
 		await firebase.deleteFile(`${user.uid}/user_images/${photo.name}`);
 		await firestore.delete({
@@ -104,6 +107,7 @@ export const setMainPhotoAction = photo => async (dispatch, getState) => {
 	const today = new Date();
 	let userDocRef = firestore.collection("users").doc(user.uid);
 	let eventAttendeeRef = firestore.collection("event_attendee");
+
 	try {
 		dispatch(asyncStartAction());
 		let batch = firestore.batch();
@@ -155,6 +159,7 @@ export const goingToEventAction = event => async (dispatch, getState) => {
 		displayName: profile.displayName,
 		host: false
 	};
+
 	try {
 		let eventDocRef = firestore.collection("events").doc(event.id);
 		let eventAttendeeDocRef = firestore
@@ -250,10 +255,58 @@ export const getUserEventsAction = (userUid, activeTab) => async (
 				.get();
 			events.push({ ...evt.data(), id: evt.id });
 		}
-		dispatch({ type: FETCH_EVENTS, payload: { events } });
+
+		dispatch({ type: FETCH_USER_EVENTS, payload: { events } });
+
 		dispatch(asyncFinishAction());
 	} catch (err) {
 		console.log(err);
 		dispatch(asyncErrorAction());
+	}
+};
+
+export const followUserAction = userToFollow => async (
+	dispatch,
+	getState,
+	{ getFirestore }
+) => {
+	const firestore = getFirestore();
+	const user = firestore.auth().currentUser;
+	const following = {
+		photoURL: userToFollow.photoURL || "/assets/user.png",
+		city: userToFollow.city || "Unknown city",
+		displayName: userToFollow.displayName
+	};
+
+	try {
+		await firestore.set(
+			{
+				collection: "users",
+				doc: user.uid,
+				subcollections: [{ collection: "following", doc: userToFollow.id }]
+			},
+			following
+		);
+	} catch (err) {
+		console.log(err);
+	}
+};
+
+export const unfollowUserAction = userToUnfollow => async (
+	dispatch,
+	getState,
+	{ getFirestore }
+) => {
+	const firestore = getFirestore();
+	const user = firestore.auth().currentUser;
+
+	try {
+		await firestore.delete({
+			collection: "users",
+			doc: user.uid,
+			subcollections: [{ collection: "following", doc: userToUnfollow.id }]
+		});
+	} catch (err) {
+		console.log(err);
 	}
 };

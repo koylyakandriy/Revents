@@ -62,7 +62,7 @@ class EventDashboard extends Component {
 		const { loadingInitial, loadedEvents, moreEvents } = this.state;
 		const { loading, activities } = this.props;
 		if (loadingInitial) return <LoadingComponent />;
-		
+
 		return (
 			<Grid>
 				<Grid.Column width={10}>
@@ -77,7 +77,7 @@ class EventDashboard extends Component {
 				</Grid.Column>
 
 				<Grid.Column width={6}>
-					<EventActivity activities={activities} contextRef={this.contextRef}/>
+					<EventActivity activities={activities} contextRef={this.contextRef} />
 				</Grid.Column>
 				<Grid.Column width={10}>
 					<Loader active={loading} />
@@ -88,7 +88,7 @@ class EventDashboard extends Component {
 }
 
 const mapStateToProps = state => ({
-	events: state.events,
+	events: state.events.events,
 	loading: state.async.loading,
 	activities: state.firestore.ordered.activity
 });
