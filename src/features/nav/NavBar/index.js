@@ -36,7 +36,7 @@ class NavBar extends Component {
 					{authenticated && (
 						<Fragment>
 							<Menu.Item as={NavLink} to='/people' name='People' />
-							<Menu.Item as={NavLink} to='/test' name='Test' />
+							{/*<Menu.Item as={NavLink} to='/test' name='Test' />*/}
 							<Menu.Item>
 								<Button
 									as={Link}
